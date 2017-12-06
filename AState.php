@@ -1,11 +1,15 @@
 <?php
+namespace phpnode\YiiStateMachine;
+
+use yii\base\Behavior;
+
 /**
  * Represents a state for a state machine
  *
  * @author Charles Pick
  * @package packages.stateMachine
  */
-class AState extends CBehavior
+class AState extends Behavior
 {
     /**
      * The state machine this state belongs to

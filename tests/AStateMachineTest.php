@@ -1,11 +1,12 @@
 <?php
-Yii::import("packages.stateMachine.*");
+namespace phpnode\YiiStateMachine\tests;
+
 /**
  * Tests for the {@AStateMachine} class
  * @author Charles Pick
  * @package packages.stateMachine.tests
  */
-class AStateMachineTest extends CTestCase
+class AStateMachineTest extends TestCase
 {
     /**
      * Tests the state machine magic methods

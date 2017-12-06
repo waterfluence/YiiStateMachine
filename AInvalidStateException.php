@@ -1,4 +1,6 @@
 <?php
+namespace phpnode\YiiStateMachine;
+
 /**
  * An exception thrown when a state machine tries to transition to an invalid state.
  * @author Charles Pick

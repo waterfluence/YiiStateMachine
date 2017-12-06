@@ -1,4 +1,8 @@
 <?php
+namespace phpnode\YiiStateMachine;
+
+use yii\base\Behavior;
+
 /**
  * Implements a simple state machine.
  * State machines can have various states, each state can provide methods and properties unique to that state
@@ -25,7 +29,7 @@
  * @author Charles Pick
  * @package packages.stateMachine
  */
-class AStateMachine extends CBehavior implements IApplicationComponent
+class AStateMachine extends Behavior
 {
     /**
      * Holds the name of the default state.

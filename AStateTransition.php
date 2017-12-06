@@ -1,11 +1,15 @@
 <?php
+namespace phpnode\YiiStateMachine;
+
+use yii\base\Event;
+
 /**
  * An event raised when a state machine transitions from one state to another
  *
  * @author Charles Pick
  * @package packages.stateMachine
  */
-class AStateTransition extends CEvent
+class AStateTransition extends Event
 {
     /**
      * The state the machine is transitioning from
