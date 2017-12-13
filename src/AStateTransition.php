@@ -28,4 +28,11 @@ class AStateTransition extends Event
      */
     public $isValid = true;
 
+    public function __construct($sender = null, $data = null)
+    {
+        $this->sender = $sender;
+        $this->data = $data;
+
+        parent::__construct();
+    }
 }

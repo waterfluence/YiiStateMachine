@@ -1,7 +1,9 @@
 <?php
 namespace phpnode\YiiStateMachine;
 
+use Yii;
 use yii\base\Behavior;
+use yii\base\Event;
 
 /**
  * Implements a simple state machine.
@@ -200,9 +202,10 @@ class AStateMachine extends Behavior
     {
         if (is_array($state)) {
             if (!isset($state['class'])) {
-                $state['class'] = "AState";
+                $state['class'] = "phpnode\YiiStateMachine\AState";
             }
-            $state = Yii::createComponent($state,$state['name'],$this);
+
+            $state = Yii::createObject($state, [$this, $state]);
         }
 
         return $this->_states[$state->getName()] = $state;
@@ -299,7 +302,7 @@ class AStateMachine extends Behavior
             return false;
         }
 
-        if (($owner = $this->getOwner()) !== null) {
+        if (($owner = $this->owner) !== null) {
 
             // we need to attach the current state to the owner
             $owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
@@ -310,13 +313,13 @@ class AStateMachine extends Behavior
         }
 
         if ($this->enableTransitionHistory) {
-            if ($this->maximumTransitionHistorySize !== null && ($c = $this->getTransitionHistory()->count() - $this->maximumTransitionHistorySize) >= 0) {
+            if ($this->maximumTransitionHistorySize !== null && ($c = count($this->_transitionHistory) - $this->maximumTransitionHistorySize) >= 0) {
                 for ($i = 0; $i <= $c; $i++) {
-                    $this->getTransitionHistory()->removeAt(0);
+                    unset($this->_transitionHistory[0]);
                 }
 
             }
-            $this->getTransitionHistory()->add($to);
+            $this->_transitionHistory[] = $to;
         }
         $this->afterTransition($fromState, $params);
 
@@ -363,12 +366,12 @@ class AStateMachine extends Behavior
         return $transition->isValid;
     }
     /**
-     * This event is raised before a state transition
+     * This event is triggered before a state transition
      * @param AStateTransition $transition the state transition
      */
     public function onBeforeTransition($transition)
     {
-        $this->raiseEvent("onBeforeTransition",$transition);
+        Event::trigger($this, "onBeforeTransition", $transition);
     }
 
     /**
@@ -388,12 +391,12 @@ class AStateMachine extends Behavior
     }
     
     /**
-     * This event is raised after a state transition
+     * This event is triggered after a state transition
      * @param AStateTransition $transition the state transition
      */
     public function onAfterTransition($transition)
     {
-        $this->raiseEvent("onAfterTransition",$transition);
+        Event::trigger($this, "onAfterTransition", $transition);
     }
     /**
      * Returns a property value based on its name.
@@ -501,7 +504,7 @@ class AStateMachine extends Behavior
     public function getTransitionHistory()
     {
         if ($this->_transitionHistory === null) {
-            $this->_transitionHistory = new CList(array($this->getStateName()));
+            $this->_transitionHistory = [ $this->getStateName() ];
         }
 
         return $this->_transitionHistory;

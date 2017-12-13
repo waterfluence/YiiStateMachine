@@ -2,6 +2,7 @@
 namespace phpnode\YiiStateMachine;
 
 use yii\base\Behavior;
+use yii\base\Event;
 
 /**
  * Represents a state for a state machine
@@ -34,10 +35,13 @@ class AState extends Behavior
      * @param string        $name  The name of the state
      * @param AStateMachine $owner the state machine this state belongs to
      */
-    public function __construct($name, AStateMachine $owner)
+    public function __construct(AStateMachine $sm, $config = [])
     {
-        $this->setName($name);
-        $this->setMachine($owner);
+        $this->setMachine($sm);
+
+        $config['owner'] = $sm;
+
+        parent::__construct($config);
     }
 
     /**
@@ -54,12 +58,12 @@ class AState extends Behavior
         return $transition->isValid;
     }
     /**
-     * This event is raised before the state is transitioned to
+     * This event is triggered before the state is transitioned to
      * @param AStateTransition $transition the state transition
      */
     public function onBeforeEnter($transition)
     {
-        $this->raiseEvent("onBeforeEnter",$transition);
+        Event::trigger($this, "onBeforeEnter", $transition);
     }
 
     /**
@@ -74,12 +78,12 @@ class AState extends Behavior
         $this->onAfterEnter($transition);
     }
     /**
-     * This event is raised after the state is transitioned to
+     * This event is triggered after the state is transitioned to
      * @param AStateTransition $transition the state transition
      */
     public function onAfterEnter($transition)
     {
-        $this->raiseEvent("onAfterEnter",$transition);
+        Event::trigger($this, "onAfterEnter", $transition);
     }
     /**
      * Invoked before the state is transitioned from
@@ -101,12 +105,12 @@ class AState extends Behavior
         return $transition->isValid;
     }
     /**
-     * This event is raised before the state is transitioned from
+     * This event is triggered before the state is transitioned from
      * @param AStateTransition $transition the state transition
      */
     public function onBeforeExit($transition)
     {
-        $this->raiseEvent("onBeforeExit",$transition);
+        Event::trigger($this, "onBeforeExit", $transition);
     }
 
     /**
@@ -120,12 +124,12 @@ class AState extends Behavior
         $this->onAfterExit($transition);
     }
     /**
-     * This event is raised after the state is transitioned from
+     * This event is triggered after the state is transitioned from
      * @param AStateTransition $transition the state transition
      */
     public function onAfterExit($transition)
     {
-        $this->raiseEvent("onAfterExit",$transition);
+        Event::trigger($this, "onAfterExit", $transition);
     }
 
     /**

@@ -1,6 +1,11 @@
 <?php
 namespace phpnode\YiiStateMachine\tests;
 
+use phpnode\YiiStateMachine\AState;
+use phpnode\YiiStateMachine\AStateMachine;
+use phpnode\YiiStateMachine\AStateTransition;
+use yii\base\Component;
+
 /**
  * Tests for the {@AStateMachine} class
  * @author Charles Pick
@@ -15,8 +20,8 @@ class AStateMachineTest extends TestCase
     {
         $machine = new AStateMachine();
         $machine->setStates(array(
-                            new ExampleEnabledState("enabled",$machine),
-                            new ExampleDisabledState("disabled",$machine),
+                            new ExampleEnabledState($machine, ['name' => 'enabled']),
+                            new ExampleDisabledState($machine, ['name' => 'disabled']),
                             ));
         $machine->defaultStateName = "enabled";
         $this->assertTrue($machine->is("enabled"));
@@ -37,7 +42,7 @@ class AStateMachineTest extends TestCase
     {
         $machine = new AStateMachine();
 
-        $machine->addState(new ExampleEnabledState("enabled",$machine));
+        $machine->addState(new ExampleEnabledState($machine, ['name' => 'enabled']));
         $this->assertFalse(isset($machine->testProperty));
         $machine->defaultStateName = "enabled";
         $this->assertTrue(isset($machine->testProperty));
@@ -53,27 +58,28 @@ class AStateMachineTest extends TestCase
     {
         $machine = new AStateMachine();
         $machine->setStates(array(
-                            new ExampleEnabledState("enabled",$machine),
-                            new ExampleDisabledState("disabled",$machine),
-                            new ExampleIntermediateState("intermediate", $machine),
+                            new ExampleEnabledState($machine, ['name' => 'enabled']),
+                            new ExampleDisabledState($machine, ['name' => 'disabled']),
+                            new ExampleIntermediateState($machine, ['name' => 'intermediate']),
                             ));
         $machine->defaultStateName = "enabled";
         $machine->enableTransitionHistory = true;
         $machine->maximumTransitionHistorySize = 2;
         $this->assertFalse($machine->transition("intermediate")); // intermediate state blocks transition from enabled -> intermediate
         $this->assertTrue($machine->transition("disabled"));
-        $this->assertEquals(2, $machine->getTransitionHistory()->count());
+        $this->assertTrue($machine->transition("intermediate"));
+        $this->assertEquals(2, count($machine->getTransitionHistory()));
         $this->assertTrue($machine->transition("intermediate")); // should work
-        $this->assertEquals(2, $machine->getTransitionHistory()->count());
+        $this->assertEquals(2, count($machine->getTransitionHistory()));
     }
 
     public function testCanTransit()
     {
         $machine = new AStateMachine();
         $machine->setStates(array(
-            new ExampleEnabledState("enabled",$machine),
-            new ExampleDisabledState("disabled",$machine),
-            new ExampleIntermediateState("intermediate", $machine),
+            new ExampleEnabledState($machine, ['name' => 'enabled']),
+            new ExampleDisabledState($machine, ['name' => 'disabled']),
+            new ExampleIntermediateState($machine, ['name' => 'intermediate']),
         ));
         $machine->defaultStateName = "enabled";
 
@@ -197,25 +203,27 @@ class AStateMachineTest extends TestCase
     {
         $machine = new AStateMachine();
         $machine->setStates(array(
-                            new ExampleEnabledState("enabled",$machine),
-                            new ExampleDisabledState("disabled",$machine),
+                            new ExampleEnabledState($machine, ['name' => 'enabled']),
+                            new ExampleDisabledState($machine, ['name' => 'disabled']),
                             ));
         $machine->defaultStateName = "enabled";
 
-        $component = new CComponent();
-        $component->attachBehavior("status",$machine);
+        $component = new Component();
+        $component->attachBehavior("status", $machine);
         $this->assertTrue($component->is("enabled"));
+        $this->assertFalse($component->is("disabled"));
         $this->assertTrue($component->demoMethod());
         $this->assertTrue($component->transition("disabled"));
-        $this->assertTrue($component->status->is("disabled"));
+        $this->assertTrue($component->is("disabled"));
+        $this->assertFalse($component->is("enabled"));
     }
 
     public function testEvents()
     {
-        $machine = $this->getMock("AStateMachine", array("onBeforeTransition", "onAfterTransition"));
+        $machine = $this->getMock("phpnode\YiiStateMachine\AStateMachine", [ "onBeforeTransition", "onAfterTransition" ]);
 
-        $enabled  = $this->getMock("AState", array("onBeforeEnter", "onBeforeExit", "onAfterEnter", "onAfterExit"), array("enabled", $machine));
-        $disabled = $this->getMock("AState", array("onBeforeEnter", "onBeforeExit", "onAfterEnter", "onAfterExit"), array("disabled", $machine));
+        $enabled  = $this->getMock("phpnode\YiiStateMachine\AState", [ "onBeforeEnter", "onBeforeExit", "onAfterEnter", "onAfterExit" ], [ $machine, [ 'name' => 'enabled' ] ]);
+        $disabled = $this->getMock("phpnode\YiiStateMachine\AState", [ "onBeforeEnter", "onBeforeExit", "onAfterEnter", "onAfterExit" ], [ $machine, [ 'name' => 'disabled' ] ]);
 
         $machine->setStates(array($enabled,$disabled));
         $machine->defaultStateName = "enabled";
