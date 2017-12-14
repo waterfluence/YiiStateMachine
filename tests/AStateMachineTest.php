@@ -196,7 +196,7 @@ class AStateMachineTest extends TestCase
             $this->assertContains($state, $states);
     }
 
-        /**
+    /**
      * Tests for the behavior functionality
      */
     public function testBehavior()
@@ -216,6 +216,24 @@ class AStateMachineTest extends TestCase
         $this->assertTrue($component->transition("disabled"));
         $this->assertTrue($component->is("disabled"));
         $this->assertFalse($component->is("enabled"));
+    }
+
+    /**
+     * Tests that we can get the owner of the state machine
+     */
+    public function testThatWeCanGetOwnerOfTheMachine()
+    {
+        $machine = new AStateMachine();
+        $machine->setStates(array(
+            new ExampleEnabledState($machine, ['name' => 'enabled']),
+            new ExampleDisabledState($machine, ['name' => 'disabled']),
+        ));
+        $machine->defaultStateName = "enabled";
+
+        $component = new Component();
+        $component->attachBehavior("status", $machine);
+
+        $this->assertSame($component->getOwner(), $machine, "Call to AStateMachine::getOwner() failed.");
     }
 
     public function testEvents()

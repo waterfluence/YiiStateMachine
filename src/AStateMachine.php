@@ -284,6 +284,14 @@ class AStateMachine extends Behavior
     }
 
     /**
+     * @return mixed
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
      * Transitions the state machine to the specified state
      * @throws AInvalidStateException if the state doesn't exist
      * @param  string                 $to The name of the state we're transitioning to
