@@ -245,7 +245,13 @@ class AStateMachine extends Behavior
             return $this->defaultStateName;
         }
 
-        return $this->_stateName;
+        $stateName = $this->_stateName;
+
+        if($this->owner->$stateName == null) {
+            return $this->defaultStateName;
+        }
+
+        return $this->owner->$stateName;
     }
     /**
      * Gets the default state
