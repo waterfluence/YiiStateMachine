@@ -24,8 +24,8 @@
   },
   "autoload": {
     "psr-4": {
-      "waterfluence\\yii2-state-machine\\": "src/",
-      "waterfluence\\yii2-state-machine\\tests\\": "tests/"
+      "waterfluence\\Yii2StateMachine\\": "src/",
+      "waterfluence\\Yii2StateMachine\\tests\\": "tests/"
     }
   }
 }
