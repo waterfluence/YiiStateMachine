@@ -57,38 +57,44 @@ class AStateMachine extends Behavior
      */
     public $maximumTransitionHistorySize;
 
-        /**
-         * Defines whather to use AState.transitsTo attribute to check transition validity.
-         * If it was set to TRUE than you should specify which states can be reached from current.
-         * For example:
-         * <pre>
-         *      $machine = new AStateMachine();
-         *      $machine->setStates(array(
-         *          array(
-         *              'name'=>'not_saved',
-         *              'transitsTo'=>'published'
-         *          ),
-         *          array(
-         *              'name'=>'published',
-         *              'transitsTo'=>'registration, canceled',
-         *          ),
-         *          array(
-         *              'name'=>'registration',
-         *              'transitsTo'=>'published, processing, canceled'
-         *          ),
-         *          array(
-         *              'name'=>'processing',
-         *              'transitsTo'=>'finished, canceled'
-         *          ),
-         *          array('name'=>'finished'),
-         *          array('name'=>'canceled')
-         *      ));
-         *      $machine->checkTransitionMap = true;
-         * </pre>
-         *
-         * @var boolean
-         */
-        public $checkTransitionMap = false;
+    /**
+     * Defines whather to use AState.transitsTo attribute to check transition validity.
+     * If it was set to TRUE than you should specify which states can be reached from current.
+     * For example:
+     * <pre>
+     *      $machine = new AStateMachine();
+     *      $machine->setStates(array(
+     *          array(
+     *              'name'=>'not_saved',
+     *              'transitsTo'=>'published'
+     *          ),
+     *          array(
+     *              'name'=>'published',
+     *              'transitsTo'=>'registration, canceled',
+     *          ),
+     *          array(
+     *              'name'=>'registration',
+     *              'transitsTo'=>'published, processing, canceled'
+     *          ),
+     *          array(
+     *              'name'=>'processing',
+     *              'transitsTo'=>'finished, canceled'
+     *          ),
+     *          array('name'=>'finished'),
+     *          array('name'=>'canceled')
+     *      ));
+     *      $machine->checkTransitionMap = true;
+     * </pre>
+     *
+     * @var boolean
+     */
+    public $checkTransitionMap = false;
+
+    /**
+     * The owner's field name that stores the current state
+     * @var string
+     */
+    public $stateField;
 
     /**
      * Holds the transition history
@@ -97,19 +103,16 @@ class AStateMachine extends Behavior
     protected $_transitionHistory;
 
     /**
-     * The name of the current state
-     * @var string
-     */
-    protected $_stateName;
-    /**
      * The supported states
      * @var AState[]
      */
+
     protected $_states = array();
     /**
      * Whether the state machine is initialized or not
      * @var boolean
      */
+
     protected $_isInitialized = false;
 
     /**
@@ -138,6 +141,7 @@ class AStateMachine extends Behavior
     {
         $this->_isInitialized = true;
     }
+
     /**
      * Attaches the state machine to a component
      * @param CComponent $owner the component to attach to
@@ -154,12 +158,13 @@ class AStateMachine extends Behavior
     }
     /**
      * Detaches the state machine from a component
+     * @param CComponent $owner the component to detach from
      */
     public function detach()
     {
         parent::detach($this->owner);
         if ($this->_uniqueID !== null) {
-            $this->owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
+            $$this->owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
         }
     }
 
@@ -222,7 +227,8 @@ class AStateMachine extends Behavior
         }
         $state = $this->_states[$stateName];
         unset($this->_states[$stateName]);
-        $this->_stateName = $this->defaultStateName;
+        $stateField = $this->stateField;
+        $this->owner->$stateField = $this->defaultStateName;
 
         return $state;
     }
@@ -232,7 +238,11 @@ class AStateMachine extends Behavior
      */
     public function setStateName($state)
     {
-        $this->_stateName = $state;
+        $stateField = $this->stateField;
+
+        if($this->getIsInitialized()) {
+            $this->owner->$stateField = $state;
+        }
     }
 
     /**
@@ -241,17 +251,13 @@ class AStateMachine extends Behavior
      */
     public function getStateName()
     {
-        if ($this->_stateName === null) {
+        $stateField = $this->stateField;
+
+        if ($stateField == null || $this->owner->$stateField === null) {
             return $this->defaultStateName;
         }
 
-        $stateName = $this->_stateName;
-
-        if($this->owner->$stateName == null) {
-            return $this->defaultStateName;
-        }
-
-        return $this->owner->$stateName;
+        return $this->owner->$stateField;
     }
     /**
      * Gets the default state
@@ -321,7 +327,7 @@ class AStateMachine extends Behavior
             // we need to attach the current state to the owner
             $owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
             $this->setStateName($to);
-            $owner->attachBehavior($this->_uniqueID."_".$to,$toState);
+            $owner->attachBehavior($this->_uniqueID."_".$to, $toState);
         } else {
             $this->setStateName($to);
         }
@@ -438,14 +444,14 @@ class AStateMachine extends Behavior
      * @throws CException if the property or event is not defined
      * @see CComponent::__get()
      */
-    public function __set($name,$value)
+    public function __set($name, $value)
     {
         $state = $this->getState();
         if ($state !== null && (property_exists($state,$name) || $state->canSetProperty($name))) {
             return $state->{$name} = $value;
         }
 
-        return parent::__set($name,$value);
+        return parent::__set($name, $value);
     }
 
     /**
@@ -476,7 +482,7 @@ class AStateMachine extends Behavior
     public function __unset($name)
     {
         $state = $this->getState();
-        if ($state !== null && (property_exists($state,$name) || $state->canSetProperty($name))) {
+        if ($state !== null && (property_exists($state, $name) || $state->canSetProperty($name))) {
             return $state->{$name} = null;
         }
 
@@ -491,14 +497,14 @@ class AStateMachine extends Behavior
      * @param  array  $parameters method parameters
      * @return mixed  the method return value
      */
-    public function __call($name,$parameters)
+    public function __call($name, $parameters)
     {
         $state = $this->getState();
-        if (is_object($state) && method_exists($state,$name)) {
-            return call_user_func_array(array($state,$name),$parameters);
+        if (is_object($state) && method_exists($state, $name)) {
+            return call_user_func_array(array($state, $name),$parameters);
         }
 
-        return parent::__call($name,$parameters);
+        return parent::__call($name, $parameters);
     }
 
     /**
