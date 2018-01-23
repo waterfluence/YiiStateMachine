@@ -2,6 +2,7 @@
 namespace phpnode\YiiStateMachine;
 
 use Yii;
+use yii\db\ActiveRecord;
 use yii\base\Behavior;
 use yii\base\Event;
 
@@ -153,13 +154,12 @@ class AStateMachine extends Behavior
     }
     /**
      * Detaches the state machine from a component
-     * @param CComponent $owner the component to detach from
      */
-    public function detach($owner)
+    public function detach()
     {
-        parent::detach($owner);
+        parent::detach($this->owner);
         if ($this->_uniqueID !== null) {
-            $owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
+            $this->owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
         }
     }
 
