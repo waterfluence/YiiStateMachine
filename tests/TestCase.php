@@ -1,5 +1,5 @@
 <?php
-namespace phpnode\YiiStateMachine\tests;
+namespace waterfluence\Yii2StateMachine\tests;
 
 /**
  * TestCase.php

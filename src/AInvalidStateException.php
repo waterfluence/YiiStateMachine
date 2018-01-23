@@ -1,5 +1,5 @@
 <?php
-namespace phpnode\YiiStateMachine;
+namespace waterfluence\Yii2StateMachine;
 
 /**
  * An exception thrown when a state machine tries to transition to an invalid state.

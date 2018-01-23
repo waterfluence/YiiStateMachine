@@ -1,5 +1,5 @@
 <?php
-namespace phpnode\YiiStateMachine;
+namespace waterfluence\Yii2StateMachine;
 
 use Yii;
 use yii\db\ActiveRecord;

@@ -1,13 +1,13 @@
 {
-  "name": "phpnode/YiiStateMachine",
+  "name": "waterfluence/yii2-state-machine",
   "type": "yii2-extension",
-  "description": "A basic finite statemachine for the Yii framework",
+  "description": "A basic finite statemachine for the Yii2 framework",
   "keywords": ["yii2", "state machine"],
-  "homepage": "https://github.com/lenrsmith/YiiStateMachine",
+  "homepage": "https://github.com/waterfluence/yii2-state-machine",
   "license": "MIT",
   "support": {
-    "issues": "https://github.com/lenrsmith/YiiStateMachine",
-    "source": "https://github.com/lenrsmith/YiiStateMachine"
+    "issues": "https://github.com/waterfluence/yii2-state-machine",
+    "source": "https://github.com/waterfluence/yii2-state-machine"
   },
   "authors": [
     {
@@ -24,8 +24,8 @@
   },
   "autoload": {
     "psr-4": {
-      "phpnode\\YiiStateMachine\\": "src/",
-      "phpnode\\YiiStateMachine\\tests\\": "tests/"
+      "waterfluence\\yii2-state-machine\\": "src/",
+      "waterfluence\\yii2-state-machine\\tests\\": "tests/"
     }
   }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace phpnode\YiiStateMachine;
+namespace waterfluence\Yii2StateMachine;
 
 use yii\base\Behavior;
 use yii\base\Event;

@@ -1,9 +1,9 @@
 <?php
-namespace phpnode\YiiStateMachine\tests;
+namespace waterfluence\Yii2StateMachine\tests;
 
-use phpnode\YiiStateMachine\AState;
-use phpnode\YiiStateMachine\AStateMachine;
-use phpnode\YiiStateMachine\AStateTransition;
+use waterfluence\Yii2StateMachine\AState;
+use waterfluence\Yii2StateMachine\AStateMachine;
+use waterfluence\Yii2StateMachine\AStateTransition;
 use yii\base\Component;
 
 /**
