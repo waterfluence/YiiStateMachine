@@ -1,5 +1,5 @@
-<h1>Yii State Machine</h1>
-An object oriented state machine for Yii. It can be used independently or as a behavior to augment your existing components / models.
+<h1>Yii2 State Machine</h1>
+An object oriented state machine for Yii2. It can be used independently or as a behavior to augment your existing components / models.
 
 
 <h2>Why is this useful?</h2>
@@ -139,7 +139,12 @@ class UserInactiveState extends AState {
  * Your user model
  * @property string $status either pending, active or inactive
  */
-class User extends CActiveRecord {
+class User extends ActiveRecord {
+    /**
+     * The property wich holds the state machine's status
+     */
+    public $status
+
     /**
      * Declares the behaviors for the model
      * @return array the behavior configuration
@@ -163,7 +168,7 @@ class User extends CActiveRecord {
                     ),
                 ),
                 "defaultStateName" => "pending",
-                "stateName" => $this->status,
+                "stateName" => 'status',
             )
         );
     }
@@ -213,7 +218,7 @@ be reached from current. See example below.
     /**
      * Represents deputy election process. 
      */
-    class Election extends CActiveRecord {
+    class Election extends ActiveRecord {
 
         public static $statuses = array(
             Election::STATUS_PUBLISHED    => 'Published',
@@ -259,7 +264,7 @@ be reached from current. See example below.
                     ),
                     "defaultStateName" => "not_saved",
                     "checkTransitionMap" => true,
-                    "stateName" => $this->statusName,
+                    "stateName" => 'statusName',
                 )
             );
         }
