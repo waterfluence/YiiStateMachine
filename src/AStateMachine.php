@@ -143,28 +143,89 @@ class AStateMachine extends Behavior
     }
 
     /**
+     * Setup handlers for the events we are going to catch
+     *
+     * @return array
+     */
+    public function events()
+    {
+        return [
+            ActiveRecord::EVENT_AFTER_FIND => 'afterFind',
+        ];
+    }
+
+    /**
+     * Catches the parent component's afterFind event which fires after the data is populated,
+     * so that we can make sure the correct state behavior is loaded. Otherwise, the $defaultStateName
+     * is always loaded regardless of what state is set.
+     */
+    public function afterFind($event)
+    {
+        $this->clearStateBehaviors();
+        $this->attachStateBehavior();
+    }
+
+    /**
      * Attaches the state machine to a component
-     * @param CComponent $owner the component to attach to
+     * @param yii\base\Component $owner the component to attach to
      */
     public function attach($owner)
     {
         parent::attach($owner);
+        $this->attachStateBehavior();
+    }
+
+    /**
+     * Attaches the current state behavior to the component.
+     * Useful on component initialization to make sure that the correct state behavior
+     * is attached.
+     */
+    public function attachStateBehavior()
+    {
         if ($this->_uniqueID === null) {
             $this->_uniqueID = uniqid();
         }
         if (($state = $this->getState()) !== null) {
-            $owner->attachBehavior($this->_uniqueID."_".$state->name,$state);
+            $this->owner->attachBehavior($this->_uniqueID."_".$state->name,$state);
         }
     }
+
     /**
      * Detaches the state machine from a component
-     * @param CComponent $owner the component to detach from
      */
     public function detach()
     {
+        $this->detachStateBehavior();
         parent::detach($this->owner);
-        if ($this->_uniqueID !== null) {
-            $$this->owner->detachBehavior($this->_uniqueID."_".$this->getStateName());
+    }
+
+    /**
+     * Detaches the current state behavior or the specificed state behavior (if it exists).
+     * Useful whenever we need to reset or initialize component state for whatever reason (init?)
+     */
+    public function detachStateBehavior($state = null)
+    {
+        if($state == null){
+            $state = $this->getState();
+        } elseif(!$state instanceof AState && $this->hasState($state)) {
+            $state = $this->_states[$state];
+        }
+
+        if ($state !== null && $this->_uniqueID !== null) {
+            $this->owner->detachBehavior($this->_uniqueID."_".$state->getName());
+        }
+    }
+
+    /**
+     * Clear attached state behaviors. Useful for resetting Component state whenever it
+     * becomes dirty. Really handing after data has populated to help make sure we have
+     * the correct state behavior attached.
+     */
+    public function clearStateBehaviors()
+    {
+        foreach($this->_states as $state)
+        {
+            $this->detachStateBehavior($state);
         }
     }
 
